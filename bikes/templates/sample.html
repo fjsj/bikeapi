@@ -1,0 +1,59 @@
+<body>
+  <input id="file" type="file"/>
+  <a href="#" onclick="javascript: upload()">Send</a>
+
+  <script type="text/javascript">
+    function ajax(obj) {
+      var method = obj.method,
+          url = obj.url,
+          data = obj.url,
+          handleXhr = obj.xhr;
+      return new Promise(function(resolve, reject) {
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+          if (this.status >= 200 && this.status < 300) {
+            resolve(xhr);
+          } else {
+            reject(xhr);
+          }
+        };
+        xhr.onerror = function () {
+          reject(xhr);
+        };
+        xhr.open(method, url);
+        handleXhr(xhr);
+        if (data !== null) {
+          xhr.send(data);
+        } else {
+          xhr.send();
+        }
+      });
+    }
+
+    function upload() {
+        var file = document.getElementById('file').files[0];
+        ajax({
+          method: 'PUT',
+          url: 'http://localhost:8000/api/upload/',
+          data: file,
+          xhr: function (xhr) {
+            xhr.setRequestHeader('Content-Type', file.type);
+            xhr.setRequestHeader('Content-Disposition',
+              'attachment; filename=upload.jpg');
+          }
+        }).then(function (xhr) {
+          console.info(
+            `Success!\n` +
+            `Status: ${xhr.status}\n` +
+            `Response: ${xhr.responseText}`);
+        }).catch(function (xhr) {
+          console.error(
+            `Error!\n` +
+            `Status: ${xhr.status}\n` +
+            `Response: ${xhr.responseText}`);
+        });
+        return false;
+    }
+  </script>
+</body>
+
